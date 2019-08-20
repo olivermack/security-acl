@@ -26,6 +26,7 @@ use Symfony\Component\Security\Acl\Model\AclCacheInterface;
 use Symfony\Component\Security\Acl\Model\AclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityFactoryInterface;
 
 /**
  * An ACL provider implementation.
@@ -57,19 +58,26 @@ class AclProvider implements AclProviderInterface
     private $permissionGrantingStrategy;
 
     /**
+     * @var SecurityIdentityFactoryInterface
+     */
+    private $securityIdentityFactory;
+
+    /**
      * Constructor.
      *
      * @param Connection                          $connection
      * @param PermissionGrantingStrategyInterface $permissionGrantingStrategy
+     * @param SecurityIdentityFactoryInterface    $securityIdentityFactory
      * @param array                               $options
      * @param AclCacheInterface                   $cache
      */
-    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
+    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, SecurityIdentityFactoryInterface $securityIdentityFactory, array $options, AclCacheInterface $cache = null)
     {
         $this->cache = $cache;
         $this->connection = $connection;
         $this->options = $options;
         $this->permissionGrantingStrategy = $permissionGrantingStrategy;
+        $this->securityIdentityFactory = $securityIdentityFactory;
     }
 
     /**
@@ -604,14 +612,7 @@ QUERY;
                 // some ACEs are shared between ACL instances
                 if (!isset($loadedAces[$aceId])) {
                     if (!isset($sids[$key = ($username ? '1' : '0').$securityIdentifier])) {
-                        if ($username) {
-                            $sids[$key] = new UserSecurityIdentity(
-                                substr($securityIdentifier, 1 + $pos = strpos($securityIdentifier, '-')),
-                                substr($securityIdentifier, 0, $pos)
-                            );
-                        } else {
-                            $sids[$key] = new RoleSecurityIdentity($securityIdentifier);
-                        }
+                        $sids[$key] = $this->securityIdentityFactory->createFromSecurityIdentifier($securityIdentifier, $username);
                     }
 
                     if (null === $fieldName) {
