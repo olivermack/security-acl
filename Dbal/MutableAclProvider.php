@@ -24,6 +24,7 @@ use Symfony\Component\Security\Acl\Model\MutableAclInterface;
 use Symfony\Component\Security\Acl\Model\MutableAclProviderInterface;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
+use Symfony\Component\Security\Acl\Model\SecurityIdentityFactoryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
@@ -38,9 +39,9 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
     /**
      * {@inheritdoc}
      */
-    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, array $options, AclCacheInterface $cache = null)
+    public function __construct(Connection $connection, PermissionGrantingStrategyInterface $permissionGrantingStrategy, SecurityIdentityFactoryInterface $securityIdentityFactory, array $options, AclCacheInterface $cache = null)
     {
-        parent::__construct($connection, $permissionGrantingStrategy, $options, $cache);
+        parent::__construct($connection, $permissionGrantingStrategy, $securityIdentityFactory, $options, $cache);
 
         $this->propertyChanges = new \SplObjectStorage();
     }
