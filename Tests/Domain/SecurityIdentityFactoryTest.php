@@ -28,7 +28,7 @@ class SecurityIdentityFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreatesUserSecurityIdentity()
     {
         $sid = 'Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Acl\Tests\Domain\Foo-foo';
-        $result = $this->sut->createFromSecurityIdentifier($sid, true);
+        $result = $this->sut->identityFromIdentifier($sid, true);
         $expected = new UserSecurityIdentity('foo', 'Acme\DemoBundle\Proxy\__CG__\Symfony\Component\Security\Acl\Tests\Domain\Foo');
 
         $this->assertEquals($expected, $result);
@@ -37,7 +37,7 @@ class SecurityIdentityFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreatesRoleSecurityIdentity()
     {
         $sid = 'SOME_ROLE';
-        $result = $this->sut->createFromSecurityIdentifier($sid);
+        $result = $this->sut->identityFromIdentifier($sid);
         $expected = new RoleSecurityIdentity('SOME_ROLE');
 
         $this->assertEquals($expected, $result);

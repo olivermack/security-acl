@@ -628,20 +628,18 @@ QUERY;
      * @param SecurityIdentityInterface $sid
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      *
      * @return string
      */
     protected function getSelectSecurityIdentityIdSql(SecurityIdentityInterface $sid)
     {
-        if ($sid instanceof UserSecurityIdentity) {
-            $identifier = $sid->getClass().'-'.$sid->getUsername();
-            $username = true;
-        } elseif ($sid instanceof RoleSecurityIdentity) {
-            $identifier = $sid->getRole();
-            $username = false;
-        } else {
-            throw new \InvalidArgumentException('$sid must either be an instance of UserSecurityIdentity, or RoleSecurityIdentity.');
+        if (!$this->securityIdentityFactory->supportsIdentity($sid)) {
+            throw new \RuntimeException('Cannot generate a statement - the SecurityIdentityFactory cannot deal with the given Identity');
         }
+
+        $identifier = $this->securityIdentityFactory->identifierFromIdentity($sid);
+        $username = $sid instanceof UserSecurityIdentity;
 
         return sprintf(
             'SELECT id FROM %s WHERE identifier = %s AND username = %s',

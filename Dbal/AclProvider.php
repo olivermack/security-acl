@@ -60,7 +60,7 @@ class AclProvider implements AclProviderInterface
     /**
      * @var SecurityIdentityFactoryInterface
      */
-    private $securityIdentityFactory;
+    protected $securityIdentityFactory;
 
     /**
      * Constructor.
@@ -612,7 +612,7 @@ QUERY;
                 // some ACEs are shared between ACL instances
                 if (!isset($loadedAces[$aceId])) {
                     if (!isset($sids[$key = ($username ? '1' : '0').$securityIdentifier])) {
-                        $sids[$key] = $this->securityIdentityFactory->createFromSecurityIdentifier($securityIdentifier, $username);
+                        $sids[$key] = $this->securityIdentityFactory->identityFromIdentifier($securityIdentifier, $username);
                     }
 
                     if (null === $fieldName) {
